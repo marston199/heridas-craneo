@@ -1,9 +1,20 @@
 CRATERIZACIÓN ÓSEA EN HERIDAS POR ARMA DE FUEGO DEL CRÁNEO / BONE CRATERING IN SKULL FIREARM WOUNDS
 =====================================================================================================
 
-CÓMO ABRIR / HOW TO OPEN
+ENLACE PARA COMPARTIR / LINK
+  https://marston199.github.io/heridas-craneo/        (computador, tablet o celular; no requiere instalar nada)
+  Modo presentación directo: https://marston199.github.io/heridas-craneo/?modo=presentacion
+  Módulo concreto (1–9):     https://marston199.github.io/heridas-craneo/?m=4      · En inglés: ?lang=en
+
+CÓMO ABRIR SIN INTERNET / OFFLINE
   Doble clic en index.html (Chrome, Edge o Firefox). Funciona sin internet y sin servidor.
-  Double-click index.html. Works offline, no server needed.
+  Tras abrir el enlace una vez, la app también queda disponible sin conexión en ese navegador.
+
+MODOS / MODES
+  🎓 Estudio: todos los paneles, para explorar en la laptop.  📽 Presentación: letra grande y pantalla limpia para
+  proyectar; avanza con ←/→, RePág/AvPág o un puntero de diapositivas. El interruptor está arriba a la izquierda.
+  En el celular la interfaz cambia sola: paneles como hojas inferiores (Etapa · ¿Por qué? · Piel · Ajustes).
+  🔗 Compartir: código QR para que los estudiantes abran la app en el celular.
 
 QUÉ HAY / WHAT IS IN IT
   · Botón INICIAR: tutorial la primera vez (5 pasos) y recorrido guiado Entrada → Salida → Comparar.
@@ -39,7 +50,8 @@ CRÉDITOS / CREDITS
   Modelo de cráneo: "ScatteringSkull" de Vladimir Petkovic, licencia CC0 1.0, Khronos glTF Sample Assets
   (https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/ScatteringSkull). Reducido a ~40 000 triángulos e
   incrustado en js/skullmodel.js. Si no carga, la app usa un cráneo procedural.
-  three.js r147 (MIT), incluido en lib/.
+  three.js r147 (MIT), incluido en lib/. Código QR: qrcode-generator de Kazuhiko Arase (MIT).
+  Publicado gratis en GitHub Pages (repositorio público marston199/heridas-craneo).
 
 TÉCNICO / TECHNICAL
   Scripts clásicos (sin módulos ES) para funcionar desde file://. Renderizado bajo demanda (0 uso de GPU en reposo),
