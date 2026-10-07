@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Craterización ósea · Bone cratering</title>
+<meta name="description" content="Simulación 3D interactiva: por qué el orificio de entrada de un proyectil en el cráneo produce un cráter interno y el de salida un cráter externo. Medicina legal.">
+<meta name="theme-color" content="#0e1116">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Craterización ósea en heridas por arma de fuego del cráneo">
+<meta property="og:description" content="Simulación 3D interactiva para medicina legal: cráter interno en la entrada, cráter externo en la salida. Funciona en el navegador y en el celular.">
+<meta property="og:url" content="https://marston199.github.io/heridas-craneo/">
+<meta property="og:image" content="https://marston199.github.io/heridas-craneo/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--bg:#0e1116;--panel:rgba(20,25,33,.86);--line:#2a3340;--tx:#e8edf2;--mut:#9aa7b5;--ac:#4cc3ff;--en:#ff8a3d;--ex:#6ee7a8}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font:14px/1.4 system-ui,Segoe UI,Roboto,sans-serif}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block;background:radial-gradient(ellipse at 50% 40%,#1b2230 0,#0e1116 70%)}
+#labels{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.lb{position:absolute;left:0;top:0;white-space:nowrap;font-size:12px;padding:1px 6px;border-radius:4px;background:rgba(10,13,18,.72);color:var(--tx);will-change:transform;transition:opacity .25s}
+.lb.big{font-size:15px;font-weight:700;letter-spacing:.04em;padding:3px 9px}
+.lb.en{color:var(--en);border:1px solid var(--en)} .lb.ex{color:var(--ex);border:1px solid var(--ex)}
+.lb.wv{color:#bfe6ff;border:1px solid #3a6a9a}.lb.bn{color:#ffd48a;border:1px solid #8a6a2a}
+.lb.hs{font-weight:700;font-size:12px;border:1px solid}
+button,select{font:inherit;color:var(--tx);background:#1a212c;border:1px solid var(--line);border-radius:8px;padding:6px 11px;cursor:pointer}
+button:hover{background:#242d3b} button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+button.on{background:var(--ac);color:#05202e;border-color:var(--ac);font-weight:600}
+#overlay{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;background:rgba(8,10,14,.55);backdrop-filter:blur(2px);transition:opacity .3s;z-index:20}
+#overlay.hide{opacity:0;pointer-events:none}
+#overlay h1{font-size:clamp(22px,4vw,40px);margin:0 0 8px;max-width:900px}
+#overlay p{color:var(--mut);font-size:clamp(14px,2vw,19px);margin:0 0 28px;max-width:700px}
+#startBtn{font-size:22px;padding:16px 44px;border-radius:14px;background:var(--ac);color:#04202d;font-weight:700;border:0;box-shadow:0 8px 40px rgba(76,195,255,.35)}
+#startBtn:hover{background:#7ad4ff}
+#ovLang{position:absolute;top:14px;right:14px}
+#hud{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .3s}
+#hud.show{opacity:1}
+#hud>*{pointer-events:auto}
+.panel{position:fixed;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;backdrop-filter:blur(4px)}
+.panel h3{margin:0 0 6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+#topbar{position:fixed;top:8px;left:12px;right:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#topbar .sp{flex:1}
+#tabs,#modes{display:flex;gap:4px}
+#stages{top:56px;left:12px;width:240px}
+#stageList{list-style:none;margin:0 0 8px;padding:0}
+#stageList li{display:flex;gap:8px;align-items:center;padding:5px 6px;border-radius:7px;cursor:pointer;color:var(--mut)}
+#stageList li:hover{background:#1c2430}
+#stageList li.act{background:#16384a;color:var(--tx);font-weight:600}
+#stageList li b{display:inline-flex;width:20px;height:20px;border-radius:50%;background:#2a3340;align-items:center;justify-content:center;font-size:11px;flex:none}
+#stageList li.act b{background:var(--ac);color:#04202d}
+#caption{font-size:13px;color:var(--tx);border-top:1px solid var(--line);padding-top:8px;min-height:60px}
+#rule{margin-top:6px;font-size:12px;color:var(--ac);font-style:italic}
+#why{top:56px;right:12px;width:310px;max-height:calc(100vh - 450px);min-height:150px;overflow:auto}
+#whyTabs{display:flex;gap:4px;margin-bottom:8px}
+.card{background:#171d27;border:1px solid var(--line);border-radius:8px;padding:7px 9px;margin-bottom:6px;font-size:12.5px;cursor:default}
+.card:hover,.card.hl{border-color:var(--ac)}
+#skinWrap{right:12px;bottom:70px;width:236px}
+#skinWrap canvas{width:212px;height:212px;border-radius:8px;display:block;margin:0 auto}
+#skinCap{font-size:11.5px;color:var(--mut);margin-top:6px}
+#leftBottom{left:12px;bottom:66px;width:300px}
+#readout{font-size:12.5px}
+#readout .k{font-size:20px;font-weight:700;color:var(--ac)}
+#paramsBtn{margin-top:6px}
+#paramsDrawer{display:none;margin-top:8px;max-height:46vh;overflow:auto}
+#paramsDrawer.open{display:block}
+.row{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:12.5px}
+.row label{flex:0 0 112px;color:var(--mut)} .row select,.row input[type=range]{flex:1;min-width:0}
+.chk{display:flex;gap:6px;align-items:center;margin:2px 0;font-size:12.5px}
+#transport{position:fixed;left:12px;right:12px;bottom:10px;display:flex;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+#scrub{flex:1;position:relative;height:26px}
+#scrub input{width:100%;margin:0;position:relative;z-index:2;background:transparent}
+#ticks{position:absolute;left:0;right:0;top:11px;height:4px;pointer-events:none}
+#ticks i{position:absolute;top:-3px;width:2px;height:10px;background:#46566b}
+#disc{position:fixed;left:50%;bottom:62px;transform:translateX(-50%);font-size:11px;color:var(--mut);pointer-events:none;white-space:nowrap;text-shadow:0 0 4px #000}
+#skullBar{top:56px;left:50%;transform:translateX(-50%);display:none;gap:6px;flex-wrap:wrap;justify-content:center;max-width:46vw}
+#skullBar.show{display:flex}
+#skullBar.show ~ #hint{top:120px}
+#hint{position:fixed;top:84px;left:50%;transform:translateX(-50%);font-size:12px;color:var(--mut);pointer-events:none;text-shadow:0 0 4px #000}
+#glossary{display:none;top:56px;right:12px;width:min(460px,92vw);max-height:78vh;overflow:auto;z-index:15}
+#glossary.open{display:block}
+#glossary dt{font-weight:700;color:var(--ac);margin-top:8px} #glossary dd{margin:2px 0 0}
+#legend{position:fixed;left:50%;top:60px;transform:translateX(-50%);display:flex;gap:12px;font-size:11.5px;pointer-events:none;background:rgba(10,13,18,.6);padding:3px 10px;border-radius:6px}
+#legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+#whyToggle{display:none}
+.panel{position:fixed}
+.colbtn{position:absolute;top:4px;right:6px;padding:0 7px;line-height:20px;font-size:12px;border-radius:6px}
+.panel.collapsed{max-height:34px!important;min-height:0!important;overflow:hidden!important}
+body.nopanels #stages,body.nopanels #why,body.nopanels #leftBottom,body.nopanels #skinWrap,body.nopanels #legend{display:none!important}
+.menu{top:50px;right:60px;display:none;flex-direction:column;gap:4px;z-index:16}.menu.open{display:flex}
+.modal{display:none;top:50%;left:50%;transform:translate(-50%,-50%);width:min(520px,92vw);z-index:25}.modal.open{display:block}
+#modDrawer{display:none;top:50px;left:12px;width:320px;max-height:78vh;overflow:auto;z-index:14}#modDrawer.open{display:block}
+.mod{display:flex;gap:8px;align-items:center;padding:7px 8px;border-radius:8px;cursor:pointer;margin-bottom:3px;background:#171d27;border:1px solid var(--line)}
+.mod:hover{border-color:var(--ac)} .mod b{width:22px;height:22px;border-radius:50%;background:#2a3340;display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+.mod.done b{background:#2e9e68;color:#fff}.mod.cur{border-color:var(--ac);background:#16384a}
+button.lnk{background:none;border:0;color:var(--mut);text-decoration:underline;padding:4px 0;font-size:12px}
+#modCard{display:none;top:92px;left:50%;transform:translateX(-50%);width:min(520px,90vw);z-index:12;text-align:left}#modCard.open{display:block}
+#modCard h4{margin:0 0 4px;font-size:17px;color:var(--ac)} #modCard p,#modCard li{font-size:13.5px;margin:4px 0} #modCard ul{padding-left:18px;margin:6px 0}
+.xbtn{position:absolute;top:6px;right:8px;width:26px;height:26px;padding:0;line-height:24px;text-align:center;border-radius:50%;font-size:13px;z-index:3}
+.panel .xbtn:hover{background:#c0392b}
+#modCard,#pauseCard,#glossary,#keysModal,#settingsModal,#modDrawer{padding-right:40px}
+.tip{position:fixed;display:none;z-index:40;pointer-events:none;background:rgba(10,13,18,.94);border:1px solid var(--ac);border-radius:8px;padding:6px 10px;font-size:12.5px;max-width:300px}
+.gl{border-bottom:1px dotted var(--ac);cursor:help;color:#bfe6ff}
+#clock{font-size:12px;color:var(--mut);min-width:128px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+#coach{position:fixed;inset:0;z-index:50}
+#coachBox{position:fixed;border-radius:10px;box-shadow:0 0 0 9999px rgba(0,0,0,.62);border:2px solid var(--ac);pointer-events:none;transition:all .25s}
+#coachBubble{position:fixed;background:#101722;border:1px solid var(--ac);border-radius:10px;padding:12px 14px;max-width:320px;font-size:14px}
+.learn{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:0 0 22px;max-width:900px}
+.learn div{background:rgba(20,25,33,.8);border:1px solid var(--line);border-radius:10px;padding:10px 14px;max-width:260px;font-size:13.5px;text-align:left}
+#cineBadge{display:none;position:fixed;top:124px;left:50%;transform:translateX(-50%);background:rgba(10,13,18,.88);border:1px solid #ffd48a;color:#ffd48a;padding:3px 14px;border-radius:8px;font-weight:700;letter-spacing:.05em;z-index:8;pointer-events:none;font-size:13px}
+#pauseCard{display:none;z-index:13;width:290px;border-color:var(--ac)}#pauseCard.open{display:block}
+#pauseCard h4{margin:0 0 4px;color:var(--ac);font-size:15px}#pauseCard p{margin:4px 0 8px;font-size:13px}
+#ticks i.pm{background:none;width:auto;height:auto;top:-14px;font-style:normal;font-size:10px;color:#ffd48a;transform:translateX(-50%)}
+.lb.pmark{border-radius:50%;background:#ffd48a;color:#1a1200;font-weight:700;padding:2px 8px}
+#microFrame{position:fixed;left:50%;transform:translateX(-50%);bottom:72px;width:384px;display:none;z-index:6}
+#microFrame.open{display:block}
+#microHead{position:static;padding:4px 10px;font-size:12px;margin-bottom:4px;border-radius:8px}
+#microView{position:relative;width:384px;height:280px;border:2px solid var(--ac);border-radius:10px;pointer-events:none}
+.ml{position:absolute;font-size:11px;padding:1px 6px;border-radius:4px;background:rgba(10,13,18,.78);color:#e8edf2;white-space:nowrap}
+#credit{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:var(--mut)}
+/* ---------- general polish ---------- */
+:root{--tbh:52px;--gold:#ffd48a}
+button,select{touch-action:manipulation}
+button:disabled{opacity:.55;cursor:wait}
+body:not(.started) #labels{display:none}
+#startRow{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+#presentBtn{font-size:18px;padding:16px 26px;border-radius:14px;border:2px solid var(--gold);color:var(--gold);background:rgba(20,25,33,.9);font-weight:700}
+#presentBtn:hover{background:#2a2414}
+#uiMode{display:flex;border:2px solid var(--gold);border-radius:10px;overflow:hidden;flex:none}
+#uiMode button{border:0;border-radius:0;background:#1a1d24;color:var(--gold);font-weight:600}
+#uiMode button.on{background:var(--gold);color:#1a1200}
+#tourBtn{width:100%;margin:2px 0 8px;font-weight:600;border-color:var(--ac);color:var(--ac)}
+#toast{position:fixed;left:50%;top:70px;transform:translate(-50%,-10px);opacity:0;pointer-events:none;z-index:60;background:rgba(10,13,18,.95);border:1px solid var(--gold);color:var(--tx);padding:9px 16px;border-radius:10px;font-size:14px;max-width:min(680px,92vw);text-align:center;transition:all .25s}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#presCap{display:none;position:fixed;z-index:5;pointer-events:none;text-align:center}
+#pcStage{font-weight:700;color:var(--ac)}
+#shareModal{text-align:center}
+#qrBox{background:#fff;border-radius:12px;padding:10px;width:min(300px,70vw);margin:8px auto}
+#qrBox svg{width:100%;height:auto;display:block}
+#shareUrl{font:600 15px/1.4 ui-monospace,Consolas,monospace;color:var(--ac);word-break:break-all;margin:6px 0 10px}
+#mobNav{display:none}
+#fsBtn.on{background:var(--ac);color:#05202e}
+
+/* ---------- presentation mode (projector) ---------- */
+body.present #stages,body.present #why,body.present #leftBottom,body.present #skinWrap,body.present #disc{display:none!important}
+body.present #topbar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}body.present #topbar>*{flex:none}
+body.present #topbar button,body.present #topbar select{font-size:15px;padding:7px 12px}
+body.present #hint{display:none}body.present #legend{white-space:nowrap}
+body.present #transport{padding:10px 16px} body.present #transport button{font-size:20px;padding:8px 16px} body.present #transport select{font-size:16px}
+body.present #clock{font-size:16px;min-width:190px}
+body.present .lb{font-size:16px} body.present .lb.big{font-size:22px} body.present .lb.hs{font-size:16px}
+body.present #legend{font-size:15px;top:64px;gap:18px}
+body.present #presCap{left:50%;transform:translateX(-50%);bottom:calc(var(--tbh) + 22px);width:min(1100px,92vw);background:rgba(10,13,18,.84);border:1px solid var(--line);border-radius:16px;padding:14px 24px}
+body.present #pcStage{font-size:28px;margin-bottom:4px} body.present #pcText{font-size:22px;line-height:1.35}
+body.present #modCard{width:min(760px,90vw)} body.present #modCard h4{font-size:24px} body.present #modCard p,body.present #modCard li{font-size:19px}
+body.present #pauseCard{width:420px} body.present #pauseCard h4{font-size:21px} body.present #pauseCard p{font-size:17px}
+body.present #cineBadge{font-size:18px;top:96px}
+
+/* ---------- mobile (phones, small tablets) ---------- */
+body.mobile #topbar{left:6px;right:6px;top:6px;gap:5px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+body.mobile #topbar::-webkit-scrollbar{display:none}
+body.mobile #topbar>*{flex:none} body.mobile #topbar .sp{display:none}
+body.mobile #topbar button,body.mobile #topbar select{padding:6px 9px;font-size:12.5px}
+body.mobile #uiMode button{padding:6px 8px}
+body.mobile #stages,body.mobile #why,body.mobile #skinWrap,body.mobile #leftBottom,body.mobile #legend,body.mobile #disc,body.mobile #clock,body.mobile .colbtn{display:none!important}
+body.mobile #stages.sheet,body.mobile #why.sheet,body.mobile #skinWrap.sheet,body.mobile #leftBottom.sheet{display:block!important;left:6px!important;right:6px!important;top:auto!important;bottom:calc(var(--tbh) + 56px)!important;width:auto!important;max-height:52vh!important;min-height:0!important;overflow:auto!important;z-index:9;transform:none!important}
+body.mobile #stages.sheet #stageList{display:block}
+body.mobile #skinWrap.sheet canvas{width:180px;height:180px}
+body.mobile #why.sheet #waveGraph{width:100%!important;height:auto!important}
+body.mobile #mobNav{display:flex;position:fixed;left:6px;right:6px;bottom:calc(var(--tbh) + 12px);gap:5px;z-index:8}
+body.mobile #mobNav button{flex:1;padding:8px 4px;font-size:13px;background:rgba(26,33,44,.94)}
+body.mobile #transport{left:6px;right:6px;bottom:calc(6px + env(safe-area-inset-bottom));flex-wrap:wrap;padding:6px 8px;gap:6px}
+body.mobile #scrub{flex-basis:100%;order:9}
+body.mobile #presCap{left:6px;right:6px;top:50px;background:rgba(10,13,18,.82);border:1px solid var(--line);border-radius:10px;padding:6px 10px;text-align:left}
+body.mobile #pcStage{font-size:13px} body.mobile #pcText{font-size:12.5px;line-height:1.3;max-height:3.9em;overflow:hidden}
+body.mobile #skullBar{top:48px;left:6px;right:6px;max-width:none;transform:none;padding:6px}
+body.mobile #skullBar button{font-size:11.5px;padding:5px 7px;flex:1 1 40%}
+body.mobile #hint{top:auto;bottom:calc(var(--tbh) + 60px);font-size:11px;max-width:94vw;white-space:normal;text-align:center}
+body.mobile .lb{font-size:10px;padding:1px 4px} body.mobile .lb.big{font-size:12px} body.mobile .lb.hs{font-size:10.5px}
+body.mobile #modCard{top:auto;bottom:calc(var(--tbh) + 60px);width:auto;left:6px;right:6px;transform:none}
+body.mobile #pauseCard{left:6px!important;right:6px;top:auto!important;bottom:calc(var(--tbh) + 60px);width:auto}
+body.mobile #microFrame{transform:translateX(-50%) scale(.78);transform-origin:50% 100%;bottom:calc(var(--tbh) + 56px)}
+body.mobile #cineBadge{top:118px;font-size:11px}
+body.mobile #modDrawer{left:6px;right:6px;width:auto;top:48px}
+body.mobile .modal{max-height:86vh;overflow:auto}
+body.mobile #overlay h1{font-size:24px} body.mobile .learn{display:none}
+body.mobile #startBtn{font-size:19px;padding:14px 30px} body.mobile #presentBtn{display:none}
+body.mobile.present #presCap{transform:none}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="labels"></div>
+<div id="perf" style="display:none;position:fixed;left:12px;top:52px;z-index:30;font:11px monospace;background:rgba(0,0,0,.7);color:#8f8;padding:3px 8px;border-radius:5px;pointer-events:none"></div>
+
+<div id="overlay">
+  <button id="ovLang" aria-label="language">ES | EN</button>
+  <h1 data-i18n="title"></h1>
+  <p data-i18n="subtitle"></p>
+  <div class="learn"><div data-i18n="sc1"></div><div data-i18n="sc2"></div><div data-i18n="sc3"></div></div>
+  <div id="startRow"><button id="startBtn" data-i18n="start" disabled>…</button><button id="presentBtn" data-i18n="present_btn" disabled></button></div>
+  <div id="credit" data-i18n="credit"></div>
+  <p id="noGL" style="display:none;margin-top:20px;color:#ff9b8a"></p>
+</div>
+
+<div id="hud">
+  <div id="topbar">
+    <div id="uiMode" role="group"><button data-ui="study" data-i18n="ui_study"></button><button data-ui="present" data-i18n="ui_present"></button></div>
+    <div id="tabs">
+      <button data-view="detail" data-i18n="tab_detail"></button>
+      <button data-view="compare" data-i18n="tab_compare"></button>
+      <button data-view="skull" data-i18n="tab_skull"></button>
+    </div>
+    <div id="modes">
+      <button data-mode="entry" data-i18n="mode_entry"></button>
+      <button data-mode="exit" data-i18n="mode_exit"></button>
+    </div>
+    <button id="modulesBtn" data-i18n="modules"></button>
+    <select id="scSel" aria-label="scenario" title="Scenario"><option value="perp"></option><option value="oblique"></option><option value="contact"></option><option value="tangential"></option></select>
+    <span class="sp"></span>
+    <button id="shareBtn" data-i18n="share"></button>
+    <button id="fsBtn" aria-label="fullscreen">⛶</button>
+    <button id="helpBtn" title="?" aria-label="help">?</button>
+    <button id="settingsBtn" aria-label="settings" title="Settings">⚙</button>
+    <button id="langBtn" aria-label="language">ES | EN</button>
+  </div>
+  <div id="helpMenu" class="panel menu">
+    <button data-hm="gloss" data-i18n="help"></button>
+    <button data-hm="keys" data-i18n="shortcuts"></button>
+    <button data-hm="tour" data-i18n="ob_again"></button>
+  </div>
+  <div id="modDrawer" class="panel">
+    <h3 data-i18n="modules"></h3>
+    <button id="tourBtn" data-i18n="tour_start"></button>
+    <div id="modProg" style="font-size:12px;color:var(--ac);margin-bottom:6px"></div>
+    <div id="modList"></div>
+    <button id="modReset" class="lnk" data-i18n="reset_progress"></button>
+  </div>
+  <div id="modCard" class="panel"></div>
+  <div id="pauseCard" class="panel"></div>
+  <div id="cineBadge"></div>
+  <div id="microFrame">
+    <div id="microHead" class="panel"><span data-i18n="mi_title"></span><button id="microClose" class="colbtn" style="position:static;float:right">✕</button></div>
+    <div id="microView">
+      <span class="ml" data-top="118" style="left:200px" data-i18n="mi_trab"></span>
+      <span class="ml" data-top="150" style="left:138px" data-i18n="mi_crack"></span>
+      <span class="ml" data-top="236" style="left:6px" data-i18n="mi_frag"></span>
+      <span class="ml" data-top="222" style="right:8px" data-i18n="mi_free"></span>
+    </div>
+  </div>
+
+  <div id="settingsModal" class="panel modal">
+    <h3 data-i18n="settings"></h3>
+    <div class="row"><label data-i18n="language"></label><select id="sLang"><option value="es">Español</option><option value="en">English</option></select></div>
+    <div class="row"><label data-i18n="quality"></label><select id="sQual"><option value="auto" data-i18n="q_auto"></option><option value="high" data-i18n="q_high"></option><option value="save" data-i18n="q_save"></option></select></div>
+    <div class="row"><label data-i18n="def_speed"></label><select id="sSpeed"><option value="0.1">0.1×</option><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1">1×</option><option value="2">2×</option></select></div>
+    <div class="chk"><input type="checkbox" id="sPauses"><label for="sPauses" data-i18n="pauses"></label></div>
+    <div class="chk"><input type="checkbox" id="sCine"><label for="sCine" data-i18n="cinematic"></label></div>
+    <div class="chk"><input type="checkbox" id="sReduce"><label for="sReduce" data-i18n="reduce_motion"></label></div>
+    <button id="settingsClose" data-i18n="close" style="margin-top:8px"></button>
+  </div>
+  <div id="shareModal" class="panel modal">
+    <h3 data-i18n="share_h"></h3>
+    <div id="qrBox"></div>
+    <div id="shareUrl"></div>
+    <p data-i18n="share_note" style="font-size:13px;color:var(--mut);margin:0 0 10px"></p>
+    <button id="copyLink" data-i18n="copy"></button> <button id="shareClose" data-i18n="close"></button>
+  </div>
+  <div id="presCap"><div id="pcStage"></div><div id="pcText"></div></div>
+  <div id="mobNav"><button data-sh="stage" data-i18n="mob_stage"></button><button data-sh="why" data-i18n="mob_why"></button><button data-sh="skin" data-i18n="mob_skin"></button><button data-sh="params" data-i18n="mob_params"></button></div>
+  <div id="toast" role="status"></div>
+  <div id="keysModal" class="panel modal"><h3 data-i18n="shortcuts"></h3><p id="keysBody" style="font-size:13px;line-height:1.7"></p><button id="keysClose" data-i18n="close"></button></div>
+  <div id="tip" class="tip"></div>
+  <div id="glPop" class="tip" style="pointer-events:auto"></div>
+  <div id="coach" style="display:none"><div id="coachBox"></div><div id="coachBubble"><div id="coachText"></div><div style="margin-top:8px;display:flex;gap:6px"><button id="coachNext"></button><button id="coachSkip"></button></div></div></div>
+
+  <div id="stages" class="panel">
+    <h3 data-i18n="stages_h"></h3>
+    <ol id="stageList"></ol>
+    <div id="caption"></div>
+    <div id="rule" data-i18n="rule"></div>
+  </div>
+
+  <div id="why" class="panel">
+    <h3 data-i18n="why_h"></h3>
+    <div id="waveBox" style="display:none;margin-bottom:8px"><canvas id="waveGraph" width="600" height="300" style="width:300px;height:150px;border-radius:8px;display:block"></canvas><ul id="waveFacts" style="font-size:11.5px;color:var(--mut);padding-left:16px;margin:6px 0 0"></ul></div>
+    <div id="whyTabs"><button data-wt="proj" data-i18n="tab_proj"></button><button data-wt="tissue" data-i18n="tab_tissue"></button><button data-wt="phys" data-i18n="tab_phys"></button></div>
+    <div id="cards"></div>
+  </div>
+
+  <div id="skullBar" class="panel">
+    <button data-sv="ent_out" data-i18n="v_ent_out"></button>
+    <button data-sv="ent_in" data-i18n="v_ent_in"></button>
+    <button data-sv="ext_out" data-i18n="v_ext_out"></button>
+    <button data-sv="ext_in" data-i18n="v_ext_in"></button>
+  </div>
+  <div id="hint"></div>
+  <div id="legend"><span><i style="background:#ff4d33"></i><span data-i18n="legend_c"></span> ⇢⇠</span><span><i style="background:#339aff"></i><span data-i18n="legend_t"></span> ⇠⇢</span><span><i style="background:#ffe633"></i><span data-i18n="legend_s"></span></span></div>
+
+  <div id="leftBottom" class="panel">
+    <div id="readout"></div>
+    <button id="paramsBtn" data-i18n="params"></button>
+    <div id="paramsDrawer">
+      <div class="row"><label data-i18n="ammo"></label><select id="pAmmo"></select></div>
+      <div class="row"><label data-i18n="bullet"></label><select id="pHP"><option value="0" data-i18n="fmj"></option><option value="1" data-i18n="hp"></option></select></div>
+      <div class="row"><label data-i18n="vel"></label><input id="pVel" type="range" min="70" max="130" value="100"><span id="pVelV" style="width:46px;text-align:right"></span></div>
+      <div class="row"><label data-i18n="thick"></label><input id="pT" type="range" min="4" max="9" step="0.5" value="6"><span id="pTV" style="width:46px;text-align:right"></span></div>
+      <div class="row" id="thetaRow" style="display:none"><label data-i18n="theta"></label><input id="pTheta" type="range" min="5" max="60" value="35"><span id="pThetaV" style="width:46px;text-align:right"></span></div>
+      <div class="row"><label data-i18n="range"></label><select id="pRange"></select></div>
+      <div id="pRangeD" style="font-size:11.5px;color:var(--mut);margin-left:120px"></div>
+      <h3 style="margin-top:10px" data-i18n="ov_expl"></h3>
+      <div class="chk"><input type="checkbox" id="cForces" checked><label for="cForces" data-i18n="ov_forces"></label></div>
+      <div class="chk"><input type="checkbox" id="cWaves"><label for="cWaves" data-i18n="ov_waves"></label></div>
+      <div class="chk"><input type="checkbox" id="cBend"><label for="cBend" data-i18n="ov_bend"></label></div>
+      <div class="chk"><input type="checkbox" id="cMicro"><label for="cMicro" data-i18n="ov_micro"></label></div>
+      <div class="chk"><input type="checkbox" id="cCut"><label for="cCut" data-i18n="cutaway"></label></div>
+      <h3 style="margin-top:10px" data-i18n="layers_h"></h3>
+      <div id="layerChecks"></div>
+      <div class="chk"><input type="checkbox" id="cStress" checked><label for="cStress" data-i18n="stress"></label></div>
+      <div class="chk"><input type="checkbox" id="cLabels" checked><label for="cLabels" data-i18n="labels"></label></div>
+      <div class="chk"><input type="checkbox" id="cFrag" checked><label for="cFrag" data-i18n="fragments"></label></div>
+    </div>
+  </div>
+
+  <div id="skinWrap" class="panel"><h3 data-i18n="skin_panel"></h3><canvas id="skin" width="212" height="212"></canvas><div id="skinCap"></div></div>
+
+  <div id="disc" data-i18n="disclaimer"></div>
+
+  <div id="transport">
+    <button id="bPrev" aria-label="prev">⏮</button>
+    <button id="bPlay" aria-label="play">▶</button>
+    <button id="bNext" aria-label="next">⏭</button>
+    <button id="bReplay" aria-label="replay">↺</button>
+    <button id="bCine" aria-label="cinematic">🎬</button>
+    <div id="clock" title=""></div>
+    <div id="scrub"><div id="ticks"></div><input id="scrubber" type="range" min="0" max="1000" value="0" aria-label="timeline"></div>
+    <select id="pSpeed" aria-label="speed"><option value="0.1">0.1×</option><option value="0.25">0.25×</option><option value="0.5" selected>0.5×</option><option value="1">1×</option><option value="2">2×</option></select>
+  </div>
+
+  <div id="glossary" class="panel"><h3 data-i18n="g_title"></h3><dl id="glossBody"></dl><button id="glossClose" data-i18n="close"></button></div>
+</div>
+
+<script src="lib/three.min.js"></script>
+<script src="lib/OrbitControls.js"></script>
+<script src="lib/GLTFLoader.js"></script>
+<script src="lib/BufferGeometryUtils.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/i18n_extra.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sim.js"></script>
+<script src="js/geometry.js"></script>
+<script src="js/projectiles.js"></script>
+<script src="js/slab.js"></script>
+<script src="js/skullmesh.js"></script>
+<script src="js/skull.js"></script>
+<script src="js/skinpanel.js"></script>
+<script src="js/waves.js"></script>
+<script src="js/micro.js"></script>
+<script src="js/cinematic.js"></script>
+<script src="js/pauses.js"></script>
+<script src="js/modules.js"></script>
+<script src="js/onboarding.js"></script>
+<script src="lib/qrcode.min.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/windows.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

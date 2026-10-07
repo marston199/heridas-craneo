@@ -1,0 +1,49 @@
+CRATERIZACIÓN ÓSEA EN HERIDAS POR ARMA DE FUEGO DEL CRÁNEO / BONE CRATERING IN SKULL FIREARM WOUNDS
+=====================================================================================================
+
+CÓMO ABRIR / HOW TO OPEN
+  Doble clic en index.html (Chrome, Edge o Firefox). Funciona sin internet y sin servidor.
+  Double-click index.html. Works offline, no server needed.
+
+QUÉ HAY / WHAT IS IN IT
+  · Botón INICIAR: tutorial la primera vez (5 pasos) y recorrido guiado Entrada → Salida → Comparar.
+  · 📚 Módulos (9, con progreso guardado): Entrada · Salida · Comparar · Ondas y fuerzas · Microestructura ·
+    Disparo oblicuo · Disparo de contacto · Disparo tangencial (ojo de cerradura) · Cráneo completo.
+  · Vistas: Detalle (corte de las capas) | Comparar (entrada y salida lado a lado) | Cráneo (modelo 3D real).
+  · Escenario (barra superior): Perpendicular · Oblicuo (ángulo ajustable) · Contacto · Tangencial.
+  · Explicación física (panel ⚙ Parámetros): Fuerzas (flechas de compresión/tracción), Ondas (onda de esfuerzo y su
+    reflexión como tracción + gráfica en vivo), Flexión (deformación ×10), Microestructura (zoom ×20, grietas, fragmentos).
+  · Proyectiles detallados: 9×19 FMJ, .38 plomo, .45 FMJ, .22 LR, 5.56 y 7.62 (con boat-tail y canelura). Punta hueca con
+    pétalos que se abren; los de fusil cabecean y el 5.56 se fragmenta a alta velocidad. Casilla "Proyectil en corte".
+  · Modo cinematográfico 🎬: cámara lenta en el impacto, congelado de 1,2 s en el astillado, cámara que sigue al proyectil.
+  · Pausas didácticas (Ajustes ⚙, desactivadas por defecto): la animación se detiene en momentos clave con una nota.
+  · Pasa el ratón sobre una capa o el proyectil para ver su descripción; haz clic en los términos subrayados (glosario).
+
+ATAJOS / SHORTCUTS
+  Espacio play/pausa · ←/→ etapa · R repetir · 1/2/3 vistas · E/X entrada/salida · L idioma · S esfuerzos · W ondas ·
+  B flexión · M microestructura · C cinematográfico · P pausas · H ocultar paneles · F rendimiento · ? ayuda · Esc cerrar.
+
+LA IDEA CLAVE / KEY IDEA
+  El cráter se abre en el sentido de la marcha del proyectil.
+  Entrada → cráter INTERNO (la tabla interna, sin apoyo, se astilla). Salida → cráter EXTERNO (se astilla la tabla externa).
+  The crater opens in the direction of the bullet's travel.
+
+NOTAS DE FIDELIDAD / NOTES
+  Esquema didáctico, no a escala; valores aproximados (energía = ½mv²; resistencias óseas ≈ 150 MPa compresión / 80 MPa
+  tracción; velocidad de onda 3 000–4 000 m/s; reflexión R ≈ −0,6; cono: tan θ = 0,35 + 0,25·log10(EC/300);
+  distancias de tatuaje/hollín) son órdenes de magnitud de manual y dependen del arma y la munición. Conviene contrastarlos
+  con la bibliografía de la asignatura. En la vista Cráneo las heridas están ampliadas ×2,2.
+  Educational schematic, not to scale; approximate values.
+
+CRÉDITOS / CREDITS
+  Modelo de cráneo: "ScatteringSkull" de Vladimir Petkovic, licencia CC0 1.0, Khronos glTF Sample Assets
+  (https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/ScatteringSkull). Reducido a ~40 000 triángulos e
+  incrustado en js/skullmodel.js. Si no carga, la app usa un cráneo procedural.
+  three.js r147 (MIT), incluido en lib/.
+
+TÉCNICO / TECHNICAL
+  Scripts clásicos (sin módulos ES) para funcionar desde file://. Renderizado bajo demanda (0 uso de GPU en reposo),
+  resolución adaptativa (Ajustes → Calidad).
+  Prueba automática: cd tests; npm i; node run.mjs  (Playwright + Edge; capturas en tests/shots).
+  Regenerar el modelo del cráneo: ver tools/prepare-skull.mjs (npm i en tools/; descarga el .glb a tools/src/).
+  Copias de seguridad por fase: backup/.

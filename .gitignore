@@ -1,0 +1,12 @@
+# local only: backups, build sources, test outputs and planning notes
+backup/
+tests/node_modules/
+tests/shots/
+tests/baseline/
+tests/logs.txt
+tools/node_modules/
+tools/src/
+tools/*.glb
+BUILD_INSTRUCTIONS.md
+IMPROVEMENT_PLAN.md
+*.log
