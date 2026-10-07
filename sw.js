@@ -1,6 +1,6 @@
-/* Service worker: network first (always the latest version when online), cache as fallback (keeps working with a bad
+﻿/* Service worker: network first (always the latest version when online), cache as fallback (keeps working with a bad
    classroom connection after the first visit). Bump VERSION on every deploy. */
-var VERSION = 'heridas-craneo-v1';
+var VERSION = 'heridas-craneo-v2';
 var CORE = ['./', 'index.html', 'manifest.webmanifest', 'icon.svg', 'icon-192.png',
   'lib/three.min.js', 'lib/OrbitControls.js', 'lib/GLTFLoader.js', 'lib/BufferGeometryUtils.js', 'lib/qrcode.min.js',
   'js/i18n.js', 'js/i18n_extra.js', 'js/data.js', 'js/sim.js', 'js/geometry.js', 'js/projectiles.js', 'js/slab.js', 'js/skullmesh.js',

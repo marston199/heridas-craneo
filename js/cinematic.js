@@ -12,7 +12,8 @@
 
   C.enabled = function () {
     var st = App.state;
-    return st.cinematic && st.view === 'detail' && !st.cineOff && !st.reduce && (st.playing || st.freezeLeft > 0);
+    // the choreographed camera is framed for landscape screens: on phones only the slow motion is used
+    return st.cinematic && st.view === 'detail' && !st.cineOff && !st.reduce && !(App.layout && App.layout.mobile) && (st.playing || st.freezeLeft > 0);
   };
   // time scale: slow motion while the stress field builds and the cone detaches
   C.warp = function (t) {
